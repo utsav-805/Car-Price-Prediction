@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Prediction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1>Car Price Prediction</h1>
+            <p>Estimate your car's price with our smart prediction model</p>
+        </div>
+    </header>
+    <main>
+        <div class="form-wrapper">
+            <form id="prediction-form">
+                <h2>Enter Car Details</h2>
+                
+                <div class="form-group">
+                    <label for="age">Car Age (Years):</label>
+                    <input type="number" id="age" name="Age" placeholder="Enter car age" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="present_price">Current Price (in Lakhs):</label>
+                    <input type="number" step="0.01" id="present_price" name="Present_Price" placeholder="Enter current price" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="kms_driven">Kilometers Driven:</label>
+                    <input type="number" id="kms_driven" name="Kms_Driven" placeholder="Enter kilometers driven" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="fuel_type">Fuel Type:</label>
+                    <select id="fuel_type" name="Fuel_Type" required>
+                        <option value="Petrol">Petrol</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="CNG">CNG</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="seller_type">Seller Type:</label>
+                    <select id="seller_type" name="Seller_Type" required>
+                        <option value="Dealer">Dealer</option>
+                        <option value="Individual">Individual</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="transmission">Transmission Type:</label>
+                    <select id="transmission" name="Transmission" required>
+                        <option value="Manual">Manual</option>
+                        <option value="Automatic">Automatic</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="owner">Number of Previous Owners:</label>
+                    <input type="number" id="owner" name="Owner" placeholder="Enter number of owners" required>
+                </div>
+
+                <button type="submit" class="btn">Predict Price</button>
+            </form>
+        </div>
+
+        <div id="result" class="result-container">
+            <h3>Predicted Price</h3>
+            <p id="predicted-price"></p>
+        </div>
+    </main>
+    <footer>
+        <p>Developed by <strong>Utsav Lanjewar</strong></p>
+    </footer>
+
+    <script>
+    document.getElementById('prediction-form').addEventListener('submit', function(e) {
+        e.preventDefault();  // Prevent default form submission
+
+        // Gather form data
+        const formData = {
+            Age: document.getElementById('age').value,
+            Present_Price: document.getElementById('present_price').value,
+            Kms_Driven: document.getElementById('kms_driven').value,
+            Fuel_Type: document.getElementById('fuel_type').value,
+            Seller_Type: document.getElementById('seller_type').value,
+            Transmission: document.getElementById('transmission').value,
+            Owner: document.getElementById('owner').value
+        };
+
+        // Send data to Flask backend
+        fetch('/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.predicted_price) {
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('predicted-price').innerText = `₹ ${data.predicted_price}`;
+            } else {
+                alert('Error in prediction: ' + data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    </script>
+</body>
+</html>
